@@ -1,6 +1,7 @@
 require 'twitter'
 require 'google_plus'
 require 'googl'
+require 'yaml'
 
 def load_env_properties()
 	properties = YAML.load_file('gplus_twitter_config.yml')
@@ -15,9 +16,9 @@ def load_env_properties()
 	puts properties
 end
 
-def update_last_posted_id(id)
-	@last_posted_id = id
-	File.open(LAST_ID_FILE_NAME, 'w') {|f| f.write(id)}
+def update_last_posted_id(etag)
+	@last_posted_etag = etag
+	File.open(LAST_ID_FILE_NAME, 'w') {|f| f.write(etag)}
 end
 
 def build_post(post, url_string)
@@ -70,13 +71,13 @@ end
 def post_new_activities(items)
 	new_items = false
 
-	if @last_posted_id == nil
+	if @last_posted_etag == nil
 		new_items = true
 	end
 
 	items.each do |item|
 		if !new_items 
-			if item.etag.gsub(/"|\\/, "") == @last_posted_id
+			if item.etag.gsub(/"|\\/, "") == @last_posted_etag
 				new_items = true
 			end
 		else
@@ -90,14 +91,14 @@ def post_new_activities(items)
 end
 
 ##### BEGIN APP LOGIC #########
-LAST_ID_FILE_NAME = 'lastid'
-@last_posted_id = nil
+LAST_ETAG_FILE_NAME = 'lastetag.txt'
+@last_posted_etag = nil
 
 load_env_properties
 
-if File.exist? LAST_ID_FILE_NAME
-	@last_posted_id = File.open(LAST_ID_FILE_NAME).read.strip
-	puts "found last id #{@last_posted_id}"
+if File.exist? LAST_ETAG_FILE_NAME
+	@last_posted_etag = File.open(LAST_ETAG_FILE_NAME).read.strip
+	puts "found last id #{@last_posted_etag}"
 end
 
 while true do 
