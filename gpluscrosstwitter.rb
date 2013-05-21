@@ -12,6 +12,7 @@ def load_env_properties()
 	@twitter_oauth_token_secret = properties['twitter_oauth_token_secret']
 
 	@google_plus_api_key = properties['google_plus_api_key']
+	@google_plus_user_id = properties['google_plus_user_id']
 
 	puts properties
 end
@@ -103,7 +104,7 @@ end
 
 while true do 
 	GooglePlus.api_key = @google_plus_api_key
-	gplus_me = GooglePlus::Person.get(114333671116123568732)
+	gplus_me = GooglePlus::Person.get(@google_plus_user_id)
 	items = gplus_me.list_activities.items
 	items = items.reverse
 
