@@ -19,7 +19,7 @@ end
 
 def update_last_posted_id(etag)
 	@last_posted_etag = etag
-	File.open(LAST_ID_FILE_NAME, 'w') {|f| f.write(etag)}
+	File.open(LAST_ETAG_FILE_NAME, 'w') {|f| f.write(etag)}
 end
 
 def build_post(post, url_string)
