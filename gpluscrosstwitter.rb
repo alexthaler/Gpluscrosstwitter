@@ -2,6 +2,10 @@ require 'twitter'
 require 'google_plus'
 require 'googl'
 require 'yaml'
+require 'logger'
+
+$log = Logger.new( 'log/log.txt', 'daily' )
+
 
 def load_env_properties()
 	properties = YAML.load_file('gplus_twitter_config.yml')
@@ -34,16 +38,16 @@ def post_tweet(data)
 		config.oauth_token_secret = @twitter_oauth_token_secret
 	end
 
-	puts "posting tweet #{data[:tweet_string]}"
+	$log.debug "posting tweet #{data[:tweet_string]}"
 
 	begin
 		Twitter.update(data[:tweet_string], {:lat => data[:tweet_lat], :long => data[:tweet_long]})
 	rescue Twitter::Error::Forbidden => e
-		puts "\n============================\n"		
-		puts "error posting to twitter!!!"
-		puts e.message
-		puts e.backtrace.inspect
-		puts "\n============================\n"
+		$log.debug "\n============================\n"		
+		$log.debug "error posting to twitter!!!"
+		$log.debug e.message
+		$log.debug e.backtrace.inspect
+		$log.debug "\n============================\n"
 	end
 end
 
@@ -99,7 +103,7 @@ load_env_properties
 
 if File.exist? LAST_ETAG_FILE_NAME
 	@last_posted_etag = File.open(LAST_ETAG_FILE_NAME).read.strip
-	puts "found last id #{@last_posted_etag}"
+	$log.debug "found last id #{@last_posted_etag}"
 end
 
 while true do 
@@ -110,7 +114,7 @@ while true do
 
 	post_new_activities(items)
 
-	puts "Sleeping for 60 seconds"
+	$log.debug "Sleeping... "
 	sleep 60
 end
 
